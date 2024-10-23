@@ -3,72 +3,70 @@ import pyqrcode
 from PIL import ImageTk, Image
 
 # Initialize the main window
-root = Tk()
+app = Tk()
 
-# Global variable to store the image label so it can be updated
-image_label = None
+# Global variable to store the QR code image
+qr_image_label = None
 
-def generate():
+def create_qr():
     """
-    This function is triggered when the 'Generate QR Code' button is clicked.
-    It fetches the link and link name from the entry fields, generates a QR code,
-    saves it as a PNG file, and displays the generated QR code on the GUI.
+    This function is triggered when the 'Create QR Code' button is clicked.
+    It retrieves the data entered by the user (name and link), generates a QR code,
+    saves it as a PNG file, and displays it in the window.
     """
-    global image_label
+    global qr_image_label
 
-    # Get the name for the QR code image file and the link to convert
-    link_name = name_entry.get()
-    link = link_entry.get()
+    # Get the link name and link from the input fields
+    file_name_entry = name_input.get()
+    link_entry = url_input.get()
 
-    # Construct the file name and generate the QR code
-    file_name = link_name + ".png"
-    url = pyqrcode.create(link)
-    url.png(file_name, scale=8)
+    # Generate the filename and create the QR code
+    qr_file = file_name_entry + ".png"
+    qr_code = pyqrcode.create(link_entry)
+    qr_code.png(qr_file, scale=8)
 
     # Load the generated QR code image
-    image = ImageTk.PhotoImage(Image.open(file_name))
+    qr_image = ImageTk.PhotoImage(Image.open(qr_file))
 
-    # Display the image on the GUI
-    if image_label is None:
-        # If no image label exists, create it
-        image_label = Label(root, image=image)
-        canvas.create_window(200, 450, window=image_label)
+    # Display the QR code image in the window
+    if qr_image_label is None:
+        qr_image_label = Label(app, image=qr_image)
+        display_area.create_window(200, 450, window=qr_image_label)
     else:
-        # If an image label already exists, update the image
-        image_label.config(image=image)
-    
-    # Keep a reference to the image to avoid garbage collection
-    image_label.image = image
+        qr_image_label.config(image=qr_image)
 
-# Create a canvas to hold all GUI elements
-canvas = Canvas(root, width=400, height=600)
-canvas.pack()
+    # Keep a reference to prevent garbage collection
+    qr_image_label.image = qr_image
 
-# Add a title label to the application
-app_label = Label(root, text="QR Code Generator", 
-                  fg="blue", 
-                  font=("Arial", 30))
-canvas.create_window(200, 50, window=app_label)
+# Create a canvas for the layout
+display_area = Canvas(app, width=400, height=600)
+display_area.pack()
 
-# Labels for the input fields
-name_label = Label(root, text="Link name")
-link_label = Label(root, text="Link")
+# Add a title label
+app_title = Label(app, text="QR Code Creator", 
+                  fg="darkblue", 
+                  font=("Helvetica", 30))
+display_area.create_window(200, 50, window=app_title)
 
-# Place the labels on the canvas
-canvas.create_window(200, 100, window=name_label)
-canvas.create_window(200, 160, window=link_label)
+# Labels for the user inputs
+label_name = Label(app, text="File Name")
+label_link = Label(app, text="URL")
 
-# Entry fields for the user to input the link name and the URL
-name_entry = Entry(root)
-link_entry = Entry(root)
+# Position the labels on the canvas
+display_area.create_window(200, 100, window=label_name)
+display_area.create_window(200, 160, window=label_link)
 
-# Place the entry fields on the canvas
-canvas.create_window(200, 130, window=name_entry)
-canvas.create_window(200, 180, window=link_entry)
+# Entry fields for name and link input
+name_input = Entry(app)
+url_input = Entry(app)
 
-# Button to trigger QR code generation
-button = Button(text="Generate QR Code", command=generate)
-canvas.create_window(200, 230, window=button)
+# Place the input fields on the canvas
+display_area.create_window(200, 130, window=name_input)
+display_area.create_window(200, 180, window=url_input)
 
-# Run the main Tkinter event loop
-root.mainloop()
+# Button to generate the QR code
+create_button = Button(text="Generate QR Code", command=create_qr)
+display_area.create_window(200, 230, window=create_button)
+
+# Start the Tkinter main loop
+app.mainloop()
